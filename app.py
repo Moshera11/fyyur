@@ -161,18 +161,17 @@ def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   #data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
-  venues= Venue.query.all()
+  venue= Venue.query.get(venue_id)
   current_time = datetime.datetime.now()
   upcoming_shows_data=[]
   upcoming_shows_count=0
   past_shows_data=[]
   past_shows_count=0
-  for venue in venues:
-    #shows= show.query.filter(show.venue_id== venue.id)
-    
-    shows= venue.venue_id
-    print(shows)
-    for sho in shows:
+  shows= venue.venue_id
+  print(shows)
+  for sho in shows:
+    print(sho.venue_id, venue.id)
+    if sho.venue_id==venue.id:
       show_time= sho.start_time
       if show_time> current_time:
         upcoming_shows_count=upcoming_shows_count+1
@@ -184,8 +183,7 @@ def show_venue(venue_id):
         artist= Artist.query.get(sho.artist_id)
         inf={'artist_id':artist.id, 'artist_name':artist.name, 'start_time': str(sho.start_time)}
         past_shows_data.append(inf)
-  print(past_shows_data)
-  print(upcoming_shows_count)
+
   
   return render_template('pages/show_venue.html', venue=Venue.query.get(venue_id), upcoming_shows= upcoming_shows_data, upcoming_shows_number=upcoming_shows_count, past_shows_number=past_shows_count, past_shows= past_shows_data)
 
@@ -273,7 +271,28 @@ def show_artist(artist_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
   #data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
-  return render_template('pages/show_artist.html', artist=Artist.query.get(artist_id))
+  artist= Artist.query.get(artist_id)
+  current_time = datetime.datetime.now()
+  upcoming_shows_data=[]
+  upcoming_shows_count=0
+  past_shows_data=[]
+  past_shows_count=0
+  shows= artist.artist_id
+  print(shows)
+  for sho in shows:
+    print(sho.venue_id)
+    show_time= sho.start_time
+    if show_time> current_time:
+      upcoming_shows_count=upcoming_shows_count+1
+      venue= Venue.query.get(sho.venue_id)
+      inf={'venue_id': venue.id, 'venue_name':venue.name, 'start_time': str(sho.start_time)}
+      upcoming_shows_data.append(inf)
+    else:
+      past_shows_count=past_shows_count+1
+      venue= Venue.query.get(sho.venue_id)
+      inf={'venue_id':venue.id, 'venue_name':venue.name, 'start_time': str(sho.start_time)}
+      past_shows_data.append(inf)
+  return render_template('pages/show_artist.html', artist=Artist.query.get(artist_id), upcoming_shows= upcoming_shows_data, upcoming_shows_number=upcoming_shows_count, past_shows_number=past_shows_count, past_shows= past_shows_data)
 
 #  Update
 #  ----------------------------------------------------------------
